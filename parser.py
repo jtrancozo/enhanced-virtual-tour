@@ -51,16 +51,17 @@ for token_element in root.findall("scene"):
                         hotspots = hotspots + "<a-sphere href=\"http://google.com\" id=\"marker" + str(hotcounter) + "\"position=\"" + str(x) + " " + str(y) + " " + str(z) + "\" radius=\"0.65\" color=\"#00ff00\" marker=\"url:"+ matches[0] +".html\"></a-sphere>" 
                         hotcounter = hotcounter + 1
 
-    #with open(name + ".html", "w") as file:
-    #    file_content = file_template.replace("__AUDIOURL__",sound)
-    #    file_content = file_content.replace("__ROOMNAME__",name)
-    #    file_content = file_content.replace("__PANORAMAURL__",panourl+".png")
-    #    file_content = file_content.replace("__HOTSPOTS__",hotspots)
+    with open(name + ".html", "w") as file:
+       file_content = file_template.replace("__AUDIOURL__",sound)
+       file_content = file_content.replace("__ROOMNAME__",name)
+       file_content = file_content.replace("__PANORAMAURL__",panourl+".png")
+       file_content = file_content.replace("__HOTSPOTS__",hotspots)
         
-    #    file.write(file_content)
-    #count = count + 1
-    #if(count > 3):
-    #    exit(0)
+       file.write(file_content)
+    count = count + 1
+    if(count > 3):
+       exit(0)
+       
 print(count)    
 
 # Print the filtered tokens
