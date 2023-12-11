@@ -1,10 +1,17 @@
 import requests
 import cv2
 import numpy as np
-
 import os
 
 IMG_DIRECTORY = "source/download_images/"
+TOUR_DATA_URL = "https://museusdigitais.pe.gov.br/wp-content/uploads/static-html-to-wp/data/9be6f15638bb21be3d4dd7f607a8c806/p360tourdata/"
+#PANO_DIRECTORY = "dsc_3944_panorama2_475"
+#pano = '3944'
+
+# URL of the image you want to download
+# image_url = "https://museusdigitais.pe.gov.br/wp-content/uploads/static-html-to-wp/data/9be6f15638bb21be3d4dd7f607a8c806/p360tourdata/dsc_3944_panorama2_475/"
+
+
 
 def download(url, filename, pano):
     try:
@@ -113,25 +120,27 @@ def stitch(n, pano):
     cv2.imwrite(output_name, result_image)
 
 
-# URL of the image you want to download
-image_url = "https://museusdigitais.pe.gov.br/wp-content/uploads/static-html-to-wp/data/9be6f15638bb21be3d4dd7f607a8c806/p360tourdata/dsc_3944_panorama2_475/"
+### toCubeMap(pano)
 
-pano = '3944'
+def makepano(panoName, pano_directory):
+    for x in range(0,6):
+        for a in range(0,2):
+            for b in range(0,2):
+                temp = TOUR_DATA_URL + pano_directory + "/" + str(x) + "/0/" + str(a) + "_" + str(b) + ".jpg" 
+                print(temp)
+                download(temp, str(x)+"_"+str(a)+"_"+str(b)+".jpg", panoName)
+        stitch(x, panoName)
+    
+    try:
+        toCubeMap(panoName)
+    except:
+        print("Erro ao criar o cubemap")
 
-# for x in range(0,6):
-#     for a in range(0,2):
-#         for b in range(0,2):
-#             temp = image_url + str(x) + "/0/" + str(a) + "_" + str(b) + ".jpg" 
-#             print(temp)
-#             download(temp, str(x)+"_"+str(a)+"_"+str(b)+".jpg", pano)
-#     stitch(x, pano)
-    #"""
-    #for a in range(0,2):
-    #    for b in range(0,2):
-    #        os.remove(str(x)+"_"+str(a)+"_"+str(b)+".jpg")
-    # """
-
-toCubeMap(pano)
+#"""
+#for a in range(0,2):
+#    for b in range(0,2):
+#        os.remove(str(x)+"_"+str(a)+"_"+str(b)+".jpg")
+# """    
 
 ##
 # py360convert

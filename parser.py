@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import re
 import math
+from downloadpano import makepano
 
 file_template = ""
 
@@ -24,9 +25,9 @@ for token_element in root.findall("scene"):
     thumburl = token_element.get("thumburl")
     substrings = re.findall(r'/(.*?)/', thumburl)
     panourl = substrings[0]
-    #print(thumburl)
+    print("## scene strings", substrings, panourl)
     hotspots = ""
-    print(len(token_element.findall("hotspot")))
+    #print(len(token_element.findall("hotspot")))
     for token_element2 in token_element.findall("hotspot"):
         if(token_element2.get("ath")!=None):
             count = count + 1
@@ -58,6 +59,14 @@ for token_element in root.findall("scene"):
        file_content = file_content.replace("__HOTSPOTS__",hotspots)
         
        file.write(file_content)
+
+    try:
+        #makepano(pano, pano_directory)
+        makepano(name, panourl)
+    except:
+        print("Erro ao criar o PANO")
+
+
     count = count + 1
     if(count > 3):
        exit(0)
