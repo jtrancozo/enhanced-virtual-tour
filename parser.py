@@ -25,7 +25,7 @@ for token_element in root.findall("scene"):
     thumburl = token_element.get("thumburl")
     substrings = re.findall(r'/(.*?)/', thumburl)
     panourl = substrings[0]
-    print("## scene strings", substrings, panourl)
+    #print("## scene strings", substrings, panourl)
     hotspots = ""
     #print(len(token_element.findall("hotspot")))
     for token_element2 in token_element.findall("hotspot"):
@@ -63,8 +63,8 @@ for token_element in root.findall("scene"):
     try:
         #makepano(pano, pano_directory)
         makepano(name, panourl)
-    except:
-        print("Erro ao criar o PANO")
+    except Exception as error:
+        print("Erro ao criar o PANO: ", error)
 
 
     count = count + 1

@@ -3,6 +3,9 @@ import cv2
 import numpy as np
 import os
 
+from PIL import Image
+import py360convert
+
 IMG_DIRECTORY = "source/download_images/"
 TOUR_DATA_URL = "https://museusdigitais.pe.gov.br/wp-content/uploads/static-html-to-wp/data/9be6f15638bb21be3d4dd7f607a8c806/p360tourdata/"
 #PANO_DIRECTORY = "dsc_3944_panorama2_475"
@@ -12,25 +15,38 @@ TOUR_DATA_URL = "https://museusdigitais.pe.gov.br/wp-content/uploads/static-html
 # image_url = "https://museusdigitais.pe.gov.br/wp-content/uploads/static-html-to-wp/data/9be6f15638bb21be3d4dd7f607a8c806/p360tourdata/dsc_3944_panorama2_475/"
 
 
+if not os.path.exists("source/download_images/"): 
+    os.makedirs("source/download_images/")
+
+if not os.path.exists("source/pano"): 
+    os.makedirs("source/pano/")     
+
 
 def download(url, filename, pano):
     try:
         # Send an HTTP GET request to the URL
         response = requests.get(url)
+
+        pano_dir = f"{IMG_DIRECTORY}{pano}"
+        local_file_path = f"{pano_dir}/{filename}"
         
         # Check if the request was successful (status code 200)
+        #print(local_file_path)
+
+        if (os.path.isfile(local_file_path)):
+            #print("Imagem já existe.")
+            return
+
         if response.status_code == 200:
             # Get the content of the response (the image binary data)
             image_data = response.content
             
             # Specify the local file path where you want to save the image
 
-            pano_dir = f"{IMG_DIRECTORY}{pano}"
-
             if not os.path.exists(pano_dir):
                 os.makedirs(pano_dir)
 
-            local_file_path = f"{pano_dir}/{filename}"
+            #local_file_path = f"{pano_dir}/{filename}"
             
             # Open a local file in binary write mode and write the image data
             with open(local_file_path, "wb") as image_file:
@@ -119,22 +135,46 @@ def stitch(n, pano):
     # Save the stitched image to a file
     cv2.imwrite(output_name, result_image)
 
+def toEquirectangular(panoName):
+    height = 2048
+    width = 4096
+    mode = 'bilinear'
+    image_path = f"source/download_images/{panoName}/cubemap.png"
+    output_image = f"source/pano/{panoName}.jpg"
 
-### toCubeMap(pano)
+    # Read image
+    image = np.array(Image.open(image_path))
+    if len(image.shape) == 2:
+        image = image[..., None]
+
+    print("Criando imagem Equiretangular... " + panoName)   
+
+    out = py360convert.c2e(image, h=height, w=width, mode=mode)
+
+    # Output image
+    Image.fromarray(out.astype(np.uint8)).save(output_image)
+
 
 def makepano(panoName, pano_directory):
-    for x in range(0,6):
-        for a in range(0,2):
-            for b in range(0,2):
-                temp = TOUR_DATA_URL + pano_directory + "/" + str(x) + "/0/" + str(a) + "_" + str(b) + ".jpg" 
-                print(temp)
-                download(temp, str(x)+"_"+str(a)+"_"+str(b)+".jpg", panoName)
-        stitch(x, panoName)
-    
-    try:
-        toCubeMap(panoName)
-    except:
-        print("Erro ao criar o cubemap")
+        
+    if not (os.path.isfile(f"{pano_directory}{panoName}/cubemap.png")):
+        for x in range(0,6):
+            for a in range(0,2):
+                for b in range(0,2):
+                    temp = TOUR_DATA_URL + pano_directory + "/" + str(x) + "/0/" + str(a) + "_" + str(b) + ".jpg" 
+                    #print(temp)
+                    download(temp, str(x)+"_"+str(a)+"_"+str(b)+".jpg", panoName)
+            stitch(x, panoName)
+        
+        try:
+            toCubeMap(panoName)
+        except:
+            print("Erro ao criar o cubemap")
+
+    #try:
+    toEquirectangular(panoName)
+    #except:
+    #    print("Erro ao criar a imagem EquiRetangular")    
 
 #"""
 #for a in range(0,2):
