@@ -4,6 +4,7 @@ import math
 from downloadpano import makepano
 
 file_template = ""
+pano_directory = "source/pano"
 
 # Open the file in read mode ("r")
 with open("template360.html", "r") as file:
@@ -55,7 +56,8 @@ for token_element in root.findall("scene"):
     with open(name + ".html", "w") as file:
        file_content = file_template.replace("__AUDIOURL__",sound)
        file_content = file_content.replace("__ROOMNAME__",name)
-       file_content = file_content.replace("__PANORAMAURL__",panourl+".png")
+       #file_content = file_content.replace("__PANORAMAURL__",panourl+".jpg")
+       file_content = file_content.replace("__PANORAMAURL__", f"{pano_directory}/{name}.jpg")
        file_content = file_content.replace("__HOTSPOTS__",hotspots)
         
        file.write(file_content)
